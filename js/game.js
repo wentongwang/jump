@@ -37,7 +37,8 @@ var Game = function() {
   this.jumperStat = {
     ready: false, // 鼠标按完没有
     xSpeed: 0, // xSpeed根据鼠标按的时间进行赋值
-    ySpeed: 0 // ySpeed根据鼠标按的时间进行赋值
+    ySpeed: 0, // ySpeed根据鼠标按的时间进行赋值
+    zSpeed: 0 //主角向中心偏移的速度
   }
   this.falledStat = {
     location: -1, // jumper所在的位置
@@ -46,6 +47,9 @@ var Game = function() {
   this.fallingStat = {
     speed: 0.2, // 游戏失败后垂直方向上的掉落速度
     end: false // 掉到地面没有
+  }
+  this.cameraStat = {
+    ready: false //摄像机视角切换是否完成
   }
 }
 Game.prototype = {
@@ -75,7 +79,9 @@ Game.prototype = {
     })
     // 监听鼠标松开的事件
     canvas.addEventListener(mouseEvents.up, function(evt) {
-      self._handleMouseup()
+      var rotateTime = parseInt(self.jumperStat.ySpeed / 0.04);
+      var rotateTimeNow = 0;
+      self._handleMouseup(rotateTime, rotateTimeNow);
     })
     // 监听窗口变化的事件
     window.addEventListener('resize', function() {
@@ -146,10 +152,10 @@ Game.prototype = {
    **/
   _handleMousedown: function() {
     var self = this
-    if (!self.jumperStat.ready && self.jumper.scale.y > 0.03) {
+    if (!self.jumperStat.ready && self.jumper.scale.y > 0.03 && !self.cameraStat.ready) {
       self.jumper.scale.y -= 0.015
       self.jumperStat.xSpeed += 0.006
-      self.jumperStat.ySpeed += 0.012
+      self.jumperStat.ySpeed += 0.03
       self._render(self.scene, self.camera)
       requestAnimationFrame(function() {
         self._handleMousedown()
@@ -157,31 +163,63 @@ Game.prototype = {
     }
   },
   // 鼠标松开或触摸结束绑定的函数
-  _handleMouseup: function() {
+  _handleMouseup: function(rotateTime, rotateTimeNow) {
     var self = this
+    self.rotateTime = rotateTime;
+    self.rotateTimeNow = rotateTimeNow + 1;
     // 标记鼠标已经松开
-    self.jumperStat.ready = true
+    self.jumperStat.ready = true;
+    self.jumperStat.zSpeed = 0.024;
+    var rotateTime = 0;
     // 判断jumper是在方块水平面之上，是的话说明需要继续运动
     if (self.jumper.position.y >= 1) {
-      // jumper根据下一个方块的位置来确定水平运动方向
-      if (self.cubeStat.nextDir === 'left') {
-        self.jumper.position.x -= self.jumperStat.xSpeed
+      if (self.rotateTime >= 15) {
+        // jumper根据下一个方块的位置来确定水平运动方向
+        if (self.cubeStat.nextDir === 'left') {
+          self.jumper.rotation['z'] = -rotateTimeNow * Math.PI / self.rotateTime; //旋转效果
+          self.jumper.position.x -= self.jumperStat.xSpeed;
+          //偏移之后向中心跳
+          if (self.jumper.position.z >= self.cubes[self.cubes.length - 1].position.z + self.jumperStat.zSpeed) {
+            self.jumper.position.z -= self.jumperStat.zSpeed;
+          }
+          if (self.jumper.position.z < self.cubes[self.cubes.length - 1].position.z - self.jumperStat.zSpeed) {
+            self.jumper.position.z += self.jumperStat.zSpeed;
+          }
+        } else {
+
+          self.jumper.rotation['x'] = -rotateTimeNow * Math.PI / self.rotateTime; //旋转效果
+          self.jumper.position.z -= self.jumperStat.xSpeed;
+          //偏移之后向中心跳
+          if (self.jumper.position.x >= self.cubes[self.cubes.length - 1].position.x + self.jumperStat.zSpeed) {
+            self.jumper.position.x -= self.jumperStat.zSpeed;
+          }
+          if (self.jumper.position.x < self.cubes[self.cubes.length - 1].position.x - self.jumperStat.zSpeed) {
+            self.jumper.position.x += self.jumperStat.zSpeed;
+          }
+        }
       } else {
-        self.jumper.position.z -= self.jumperStat.xSpeed
+        // jumper根据下一个方块的位置来确定水平运动方向
+        if (self.cubeStat.nextDir === 'left') {
+          self.jumper.position.x -= self.jumperStat.xSpeed;
+        } else {
+          self.jumper.position.z -= self.jumperStat.xSpeed;
+        }
       }
       // jumper在垂直方向上运动
       self.jumper.position.y += self.jumperStat.ySpeed
+      //self.jumper.rotation['x'] = Math.sin(Math.PI * .25) * self.jumper.position.x + Math.cos(Math.PI * .25) * self.jumper.position.y;
       // 运动伴随着缩放
       if (self.jumper.scale.y < 1) {
         self.jumper.scale.y += 0.03
       }
       // jumper在垂直方向上先上升后下降
-      self.jumperStat.ySpeed -= 0.015
+      self.jumperStat.ySpeed -= 0.04
       // 每一次的变化，渲染器都要重新渲染，才能看到渲染效果
       self._render(self.scene, self.camera)
       requestAnimationFrame(function() {
-        self._handleMouseup()
-      })
+        self._handleMouseup(self.rotateTime, self.rotateTimeNow)
+      });
+
     } else {
       // jumper掉落到方块水平位置，开始充值状态，并开始判断掉落是否成功
       self.jumperStat.ready = false
@@ -190,6 +228,8 @@ Game.prototype = {
       self.jumper.position.y = 1
       self._checkInCube()
       if (self.falledStat.location === 1) {
+        self.jumper.rotation['x'] = 2 * Math.PI;
+        self.jumper.rotation['z'] = 2 * Math.PI;
         // 掉落成功，进入下一步
         self.score++
           self._createCube()
@@ -215,7 +255,7 @@ Game.prototype = {
     var rotateAdd = self.jumper.rotation[rotateAxis] + 0.1 // 旋转速度
     var rotateTo = self.jumper.rotation[rotateAxis] < Math.PI / 2 // 旋转结束的弧度
     var fallingTo = self.config.ground + self.config.jumperWidth / 2 + offset
-
+    self.cameraStat.ready = false;
     if (dir === 'rightTop') {
       rotateAxis = 'x'
       rotateAdd = self.jumper.rotation[rotateAxis] - 0.1
@@ -265,7 +305,7 @@ Game.prototype = {
    *通过确定掉落的位置来确定掉落效果
    **/
   _falling: function() {
-    var self = this
+    var self = this;
     if (self.falledStat.location == 0) {
       self._fallingRotate('none')
     } else if (self.falledStat.location === -10) {
@@ -361,7 +401,8 @@ Game.prototype = {
   },
   // 基于更新后的摄像机位置，重新设置摄像机坐标
   _updateCamera: function() {
-    var self = this
+    var self = this;
+    self.cameraStat.ready = true;
     var c = {
       x: self.cameraPos.current.x,
       y: self.cameraPos.current.y,
@@ -373,8 +414,8 @@ Game.prototype = {
       z: self.cameraPos.next.z
     }
     if (c.x > n.x || c.z > n.z) {
-      self.cameraPos.current.x -= 0.1
-      self.cameraPos.current.z -= 0.1
+      self.cameraPos.current.x -= 0.15
+      self.cameraPos.current.z -= 0.15
       if (self.cameraPos.current.x - self.cameraPos.next.x < 0.05) {
         self.cameraPos.current.x = self.cameraPos.next.x
       }
@@ -386,6 +427,8 @@ Game.prototype = {
       requestAnimationFrame(function() {
         self._updateCamera()
       })
+    } else {
+      self.cameraStat.ready = false;
     }
   },
   merge: function(e) {
@@ -487,13 +530,14 @@ Game.prototype = {
     this.scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, .28);
+    //directionalLight.position.set(75, 120, -100);
     directionalLight.position.set(25, 40, -10);
     directionalLight.castShadow = true;
-    directionalLight.shadowCameraLeft = -50;
-    directionalLight.shadowCameraRight = 50;
-    directionalLight.shadowCameraTop = 50;
-    directionalLight.shadowCameraBottom = -50;
-    directionalLight.shadowMapWidth = directionalLight.shadowMapHeight = 1024 * 2; //阴影分辨率
+    directionalLight.shadowCameraLeft = -200;
+    directionalLight.shadowCameraRight = 200;
+    directionalLight.shadowCameraTop = 200;
+    directionalLight.shadowCameraBottom = -200;
+    directionalLight.shadowMapWidth = directionalLight.shadowMapHeight = 1024 * 4; //阴影分辨率
     this.scene.add(directionalLight)
 
     /*var light = new THREE.AmbientLight(0xffffff, 0.3)
