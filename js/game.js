@@ -443,15 +443,18 @@ Game.prototype = {
     var r = THREE;
     var texloader = new THREE.TextureLoader();
     var t = new r.MeshBasicMaterial({
-      map: texloader.load("res/head.png")
+      //map: texloader.load("res/head.png")
+      color: 0x000000
     });
     this.obj = new r.Object3D, this.obj.name = "jumper", this.trail = null, this.jumper = new r.Object3D;
     this.human = new r.Object3D, this.head = new r.Mesh(new r.SphereGeometry(1 * .45, 20, 20), t), this.head.castShadow = !0, this.bottom = new r.Mesh(new r.CylinderGeometry(.4158, .60007, 1 * .45 * 2.68, 20), new r.MeshBasicMaterial({
-      map: texloader.load("res/bottom.png")
+      //map: texloader.load("res/bottom.png")
+      color: 0x000000
     })), this.bottom.rotation.y = 4.7, this.bottom.castShadow = !0;
     var i = new r.CylinderGeometry(1 * .45, .4158, 1 * .45 * 1.2, 20),
       n = [new r.MeshBasicMaterial({
-        map: texloader.load("res/top.png")
+        //map: texloader.load("res/top.png")
+        color: 0x000000
       }), t],
       a = new r.Geometry;
     i.rotateY(4.7), this.merge(a, i, 0, [{
