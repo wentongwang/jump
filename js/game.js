@@ -561,10 +561,12 @@ Game.prototype = {
   _setRenderer: function() {
     this.renderer.setSize(this.size.width, this.size.height)
     this.renderer.setClearColor(this.config.background)
-    this.renderer.shadowMapEnabled = true; //开启阴影
+    this.renderer.shadowMap.enabled = true; //开启阴影
     //this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.precision = 'highp'; //防止在移动端浏览器模糊
-    this.renderer.setPixelRatio(window.devicePixelRatio); //防止在移动端浏览器模糊
+    this.renderer.precision = 'highp'; //着色精度选择
+    if (document.body.clientWidth < 767) {
+      this.renderer.setPixelRatio(window.devicePixelRatio < 2 ? window.devicePixelRatio : 2); //防止在移动端浏览器模糊
+    }
     document.body.appendChild(this.renderer.domElement)
     //添加平面, 绘制阴影
     var planeGeometry = new THREE.PlaneGeometry(this.size.width, this.size.height, 2, 2);
