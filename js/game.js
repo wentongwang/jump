@@ -51,6 +51,7 @@ var Game = function() {
   this.cameraStat = {
     ready: false //摄像机视角切换是否完成
   }
+  this.rank = document.getElementById("rank");
 }
 Game.prototype = {
   init: function() {
@@ -157,6 +158,7 @@ Game.prototype = {
       self.jumperStat.xSpeed += 0.006
       self.jumperStat.ySpeed += 0.03
       self._render(self.scene, self.camera)
+      this.rank.style.display = "none";
       requestAnimationFrame(function() {
         self._handleMousedown()
       })
@@ -170,7 +172,6 @@ Game.prototype = {
     // 标记鼠标已经松开
     self.jumperStat.ready = true;
     self.jumperStat.zSpeed = 0.024;
-    var rotateTime = 0;
     // 判断jumper是在方块水平面之上，是的话说明需要继续运动
     if (self.jumper.position.y >= 1) {
       if (self.rotateTime >= 15) {
@@ -536,11 +537,11 @@ Game.prototype = {
     //directionalLight.position.set(75, 120, -100);
     directionalLight.position.set(25, 40, -10);
     directionalLight.castShadow = true;
-    directionalLight.shadowCameraLeft = -200;
-    directionalLight.shadowCameraRight = 200;
-    directionalLight.shadowCameraTop = 200;
-    directionalLight.shadowCameraBottom = -200;
-    directionalLight.shadowMapWidth = directionalLight.shadowMapHeight = 1024 * 4; //阴影分辨率
+    directionalLight.shadow.camera.left = -200;
+    directionalLight.shadow.camera.right = 200;
+    directionalLight.shadow.camera.top = 200;
+    directionalLight.shadow.camera.bottom = -200;
+    directionalLight.shadow.mapSize.width = directionalLight.shadow.mapSize.height = 1024 * 4; //阴影分辨率
     this.scene.add(directionalLight)
 
     /*var light = new THREE.AmbientLight(0xffffff, 0.3)

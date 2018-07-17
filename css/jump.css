@@ -1,9 +1,22 @@
+@import url(https://fonts.googleapis.com/css?family=Finger+Paint);
 body{
   padding: 0;
   margin: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
+}
+@media screen and (max-width: 1080px) { 
+	body {font-size: 36px;} 
+}
+@media screen and (max-width: 1024px) { 
+	body {font-size: 32px;} 
+}
+@media screen and (max-width: 768px) { 
+	body {font-size: 24px;} 
+}
+@media screen and (max-width: 414px) { 
+	body {font-size: 16px;} 
 }
 .mask{
 	display: none;
@@ -20,8 +33,8 @@ body{
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 500px;
-	height: 500px;
+	width: 80%;
+	height: 70%;
 	border-radius: 20px;
 	background: rgba(0,0,0,0.4);
 	border: 5px solid rgba(255,255,255,0.05);
@@ -32,24 +45,24 @@ body{
 	text-align: center;
 }
 .title{
-  font-size: 20px;
+  font-size: 2em;
   font-weight: bold;
   color: rgb(255,255,255);
 }
 .score{
-	font-size: 100px;
+	font-size: 4em;
 	font-weight: bold;
 	margin-top: 20px;
 }
 button.restart{
-	width: 200px;
-	height: 40px;
+	width: 7em;
+	height: 1.5em;
 	border-radius: 20px;
 	background: white;
 	border: none;
-  font-weight: bold;
-  font-size: 20px;
-  cursor: pointer;
+	font-weight: bold;
+	font-size: 1.5em;
+	cursor: pointer;
 }
 button.restart:hover{
 	color:#232323;
@@ -75,5 +88,112 @@ a.title{
 .score-gaming{
 	margin-top: 10px;
 	color: rgba(0,0,0,1);
-	font-size: 16px;
+	font-size: 2em;
+}
+.score-current{
+	font-family: "Finger Paint";
+}
+#rank{
+	position: absolute;
+	bottom: 4em;
+	left: 50%;
+	margin-left: -2em;
+	opacity: 0.5;
+	font-size: 2em;
+	display: block;
+}
+#rank img{
+	width: 1em;
+	height: 1em;
+	vertical-align:middle;
+}
+#rank span{
+	font-size: .5em;
+	vertical-align:middle;
+}
+.rank-mask{
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background: #000;
+	opacity: 0.3;
+	display: none;
+}
+.rank-list{
+	width: 80%;
+	height: 60%;
+	position: absolute;
+	top: 10%;
+	left: 10%;
+	display: none;
+}
+.rank-list .rank-close{
+	height: 2em;
+	width: 2em;
+	border-radius: 50%;
+	background: #fff;
+	position: absolute;
+	right: -1em;
+    top: -1em;
+    color: #09b909;
+    text-align: center;
+    line-height: 2em;
+}
+.rank-list .list-head{
+	color: #fff;
+	height: 7%;
+	width: 100%;
+	line-height: 200%;
+	background: #1B1716;
+}
+.rank-list .list-container{
+	width: 100%;
+	height: 93%;
+	overflow-y: scroll;
+	background: #1B1716;
+}
+.list-container .list-item{
+	height: 15%;
+	width: 100%;
+	color: #fff;
+	font-size: 1.2em;
+	line-height: 200%;
+	display: flex;
+	text-align: center;
+	/*justify-content: space-around;*/
+}
+.list-container .item-odd{
+	background: #201C1B;
+}
+.list-item .item-num{
+	width: 20%;
+	font-family: "Finger Paint";
+}
+.list-item .item-name{
+	width: 60%;
+}
+.list-item .item-score{
+	width: 20%;
+}
+.list-item .item-one{
+	color: #AB835E;
+}
+.list-item .item-two{
+	color: #CDBD85;
+}
+.list-item .item-three{
+	color: #C0AE79;
+}
+.my-list{
+	color: #fff;
+	margin-top: 2em;
+}
+.my-list .list-item{
+	width: 100%;
+	color: #fff;
+	background: #1B1716;
+	font-size: 1.2em;
+	line-height: 300%;
+	display: flex;
+	text-align: center;
 }
